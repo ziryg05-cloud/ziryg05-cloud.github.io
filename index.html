@@ -563,8 +563,8 @@ footer{padding-block:12px 40px;font-size:13px;color:var(--muted);display:flex;ju
   function renderQ(){
     var q=S.questions[idx], a=answers[q.id];
     root.innerHTML='';
-    root.appendChild(h('<div class="sv-head"><h3>'+S.title+'<span class="zh">'+S.title_zh+'</span></h3><span class="muted" style="font-size:13px">'+(idx+1)+' of '+S.questions.length+'</span></div><div class="sv-prog"><i style="width:'+(idx/S.questions.length*100)+'%"></i></div>'));
-    root.appendChild(h('<p class="sv-q">'+q.text+'<small>Original item: '+q.orig.text+' · '+q.orig.text_zh+(q.type==='multi'?' · pick any':'')+'</small></p>'));
+    root.appendChild(h('<div class="sv-head"><h3>'+S.title+'</h3><span class="muted" style="font-size:13px">'+(idx+1)+' of '+S.questions.length+'</span></div><div class="sv-prog"><i style="width:'+(idx/S.questions.length*100)+'%"></i></div>'));
+    root.appendChild(h('<p class="sv-q">'+q.text+'<small>Original item: '+q.orig.text+(q.type==='multi'?' · pick any':'')+'</small></p>'));
     var opts=h('<div class="sv-opts" role="'+(q.type==='multi'?'group':'radiogroup')+'"></div>').firstChild;
     q.options.forEach(function(o,i){
       var on = q.type==='multi' ? (Array.isArray(a)&&a.indexOf(i)>=0) : a===i;
@@ -588,9 +588,9 @@ footer{padding-block:12px 40px;font-size:13px;color:var(--muted);display:flex;ju
     root.innerHTML='';
     var ax=S.axes.map(function(a){ var s=sc[a.id], tot=s.low+s.high, p= tot? s.high/tot : 0.5;
       return '<div class="axis"><span>'+a.low+'</span><div class="track"><span class="knob" style="left:'+(p*100)+'%"></span></div><span class="r">'+a.high+'</span></div>'; }).join('');
-    root.appendChild(h('<div class="sv-result"><div class="avatar">'+t.svg+'</div><div><span class="try">Your type</span><h3>'+t.name+'<span class="zhname">'+t.name_zh+'</span></h3><p style="margin-top:12px;max-width:52ch">'+t.desc+'</p><div class="sv-axes">'+ax+'</div>'+fl.map(function(f){return '<span class="flag">Flag for the owner: '+f+'</span>';}).join(' ')+'</div></div>'));
+    root.appendChild(h('<div class="sv-result"><div class="avatar">'+t.svg+'</div><div><span class="try">Your type</span><h3>'+t.name+'</h3><p style="margin-top:12px;max-width:52ch">'+t.desc+'</p><div class="sv-axes">'+ax+'</div>'+fl.map(function(f){return '<span class="flag">Flag for the owner: '+f+'</span>';}).join(' ')+'</div></div>'));
     var rows=S.questions.map(function(q){ var cs=chosen(q,answers[q.id]); var en=cs.map(function(o){return q.orig.options[o.orig];}).join(', ')||'—'; var zh=cs.map(function(o){return q.orig.options_zh[o.orig];}).join('、');
-      return '<tr><td>'+q.orig.text+'<span class="zh">'+esc(q.orig.text_zh)+'</span></td><td>'+esc(en)+'<span class="zh">'+esc(zh)+'</span></td></tr>'; }).join('');
+      return '<tr><td>'+q.orig.text+'</td><td>'+esc(en)+'</td></tr>'; }).join('');
     root.appendChild(h('<div class="sv-owner"><div><span class="try">What the restaurant owner sees</span><p class="note">Your playful answers, written back as the plain survey items they came from. This is the row that goes into the CSV.</p></div><div class="tablewrap"><table><thead><tr><th>Original item</th><th>Your answer, mapped back</th></tr></thead><tbody>'+rows+'</tbody></table></div><div class="sv-nav"><span class="muted" style="font-size:13px">'+(dur?('Completed in '+Math.round(dur)+' s'):'')+'</span><button class="btn" id="svAgain">Take it again</button></div></div>'));
     root.querySelector('#svAgain').addEventListener('click', function(){ idx=0; answers={}; started=null; renderQ(); });
   }
