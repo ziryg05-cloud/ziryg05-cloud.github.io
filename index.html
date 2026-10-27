@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ziry Guo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Ziry Guo builds learning tools. Try them here: a Mandarin tone scorer, a survey-to-quiz converter, a tab organiser, and Hello Roots.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: one left-aligned column, 1040px wide. The hero is text beside a portrait; every project after it is
+   something the visitor operates, framed by a display heading and a short "what I did" line. */
+:root{
+  --bg:#F6F7F9;        /* cool paper */
+  --surface:#FFFFFF;
+  --fg:#151C2C;        /* ink navy */
+  --muted:#5B6479;
+  --line:#D9DEE7;
+  --accent:#E26C12;    /* marigold, from the Quebec photo */
+  --accent-ink:#FFFFFF;
+  --accent-soft:#FBE7D6;
+  --green:#2E8B57;     /* the roof */
+  --t1:#2E8B57; --t2:#2F6FE0; --t3:#8A4FD6; --t4:#D6392E; --t5:#A0741C;
+  --display:'Syne','Instrument Sans',system-ui,sans-serif;
+  --body:'Instrument Sans','PingFang SC','Hiragino Sans GB','Noto Sans SC','Microsoft YaHei',system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+  --bg:#0E131D; --surface:#161C29; --fg:#E9EDF5; --muted:#9AA5BC; --line:#2A3345;
+  --accent:#FF8A3D; --accent-ink:#1A0E05; --accent-soft:#3A2415; --green:#4FBF82;
+  --t1:#4FBF82; --t2:#6C9BFF; --t3:#B08CFF; --t4:#FF6B5E; --t5:#D9A54A; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0E131D; --surface:#161C29; --fg:#E9EDF5; --muted:#9AA5BC; --line:#2A3345;
+  --accent:#FF8A3D; --accent-ink:#1A0E05; --accent-soft:#3A2415; --green:#4FBF82;
+  --t1:#4FBF82; --t2:#6C9BFF; --t3:#B08CFF; --t4:#FF6B5E; --t5:#D9A54A; color-scheme:dark }
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0}
+a{color:inherit;text-decoration-color:var(--accent);text-underline-offset:3px}
+a:hover{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+img{max-width:100%;display:block}
+button{font:inherit;color:inherit}
+.wrap{max-width:1040px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);line-height:1.05;text-wrap:balance;margin:0}
+h1{font-weight:800;font-size:clamp(44px,8vw,88px);letter-spacing:-.02em}
+h2{font-weight:800;font-size:clamp(34px,5vw,56px);letter-spacing:-.015em}
+h3{font-weight:700;font-size:20px}
+p{margin:0}
+.muted{color:var(--muted)}
+.prose{max-width:62ch}
+
+/* top bar */
+.top{display:flex;justify-content:space-between;align-items:center;padding-block:22px;font-weight:500}
+.top nav{display:flex;gap:22px;flex-wrap:wrap}
+.top nav a{text-decoration:none;color:var(--muted)}
+.top nav a:hover{color:var(--accent)}
+.mark{font-family:var(--display);font-weight:800;letter-spacing:-.02em;white-space:nowrap}
+
+/* hero */
+.hero{display:grid;grid-template-columns:3fr 2fr;gap:48px;align-items:end;padding-block:48px 72px}
+.hero .lede{font-size:clamp(18px,2.2vw,22px);max-width:30ch;margin-top:22px}
+.hero .lede b{font-weight:600}
+.hero .zh{margin-top:10px;font-size:15px}
+.portrait{position:relative}
+.portrait img{border-radius:6px;aspect-ratio:4/5;object-fit:cover;object-position:50% 30%;width:100%;height:auto}
+.portrait::after{content:"";position:absolute;inset:14px -14px -14px 14px;border:2px solid var(--accent);border-radius:6px;z-index:-1}
+.portrait figcaption{margin-top:22px;font-size:13px;color:var(--muted)}
+.cta{display:inline-flex;gap:10px;align-items:center;margin-top:30px;padding:12px 18px;border-radius:999px;background:var(--fg);color:var(--bg);text-decoration:none;font-weight:600}
+.cta:hover{background:var(--accent);color:var(--accent-ink)}
+@media (max-width:720px){.hero{grid-template-columns:1fr;gap:36px;padding-block:24px 56px}.portrait{max-width:360px}}
+
+/* project sections */
+.project{border-top:2px solid var(--fg);padding-block:36px 84px;display:grid;grid-template-columns:1fr;gap:28px}
+.project header{display:grid;grid-template-columns:1fr auto;gap:20px 40px;align-items:start}
+.project header .what{max-width:60ch;margin-top:14px;font-size:17px}
+.project header .meta{display:grid;gap:4px;font-size:14px;color:var(--muted);min-width:0}
+.project header .meta b{color:var(--fg);font-weight:600}
+@media (max-width:720px){.project header{grid-template-columns:1fr}}
+.try{display:inline-block;font-size:13px;font-weight:600;color:var(--accent);margin-bottom:10px}
+.note{font-size:14px;color:var(--muted);max-width:70ch}
+.note code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;background:var(--accent-soft);color:var(--fg);padding:1px 5px;border-radius:4px}
+.links{display:flex;gap:18px;flex-wrap:wrap;font-size:15px}
+
+/* the demo frame: one bordered object per project */
+.demo{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.btn{appearance:none;border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:999px;cursor:pointer;font-weight:500;font-size:14px}
+.btn:hover{border-color:var(--fg)}
+.btn.primary{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn.primary:hover{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:default}
+
+/* ToneViz */
+.tv{display:grid;grid-template-columns:3fr 2fr}
+.tv-canvas{padding:18px;border-right:1px solid var(--line);min-width:0}
+.tv-canvas canvas{width:100%;height:auto;display:block;touch-action:none;cursor:crosshair;border-radius:6px}
+.tv-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.tv-tools .sep{width:1px;height:22px;background:var(--line)}
+.tv-tools .lab{font-size:13px;color:var(--muted);margin-right:2px}
+.tv-result{padding:22px;display:grid;gap:18px;align-content:start;min-width:0}
+.tv-big{display:flex;align-items:baseline;gap:14px}
+.tv-big .score{font-family:var(--display);font-weight:800;font-size:64px;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.tv-big .of{color:var(--muted)}
+.tv-detected{font-size:15px}
+.tv-detected b{font-weight:600}
+.bars{display:grid;gap:7px}
+.bar{display:grid;grid-template-columns:52px 1fr 36px;gap:10px;align-items:center;font-size:13px}
+.bar .track{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.bar .fill{height:100%;border-radius:4px;transition:width .35s ease}
+.bar .v{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.tv-fb{font-size:15px;line-height:1.5;padding:14px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 6px 6px 0}
+.tv-status{font-size:13px;color:var(--muted);min-height:1.4em}
+@media (max-width:760px){.tv{grid-template-columns:1fr}.tv-canvas{border-right:0;border-bottom:1px solid var(--line)}}
+
+/* Survey quiz */
+.sv{padding:22px;display:grid;gap:18px}
+.sv-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap}
+.sv-head h3{font-size:22px}
+.sv-head .zh{font-family:var(--body);font-weight:500;color:var(--muted);font-size:15px;margin-left:10px}
+.sv-prog{height:4px;background:var(--line);border-radius:2px;overflow:hidden}
+.sv-prog i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s ease}
+.sv-q{font-size:19px;font-weight:600;line-height:1.35;max-width:46ch}
+.sv-q small{display:block;font-weight:400;font-size:13px;color:var(--muted);margin-top:4px}
+.sv-opts{display:grid;gap:8px}
+.sv-opt{display:flex;gap:12px;align-items:center;text-align:left;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface);cursor:pointer}
+.sv-opt:hover{border-color:var(--fg)}
+.sv-opt[aria-checked="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.sv-opt .dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--muted);flex:none}
+.sv-opt[data-multi] .dot{border-radius:4px}
+.sv-opt[aria-checked="true"] .dot{border-color:var(--accent);background:var(--accent)}
+.sv-nav{display:flex;gap:10px;justify-content:space-between;align-items:center}
+.sv-result{display:grid;grid-template-columns:200px 1fr;gap:26px;align-items:start}
+.sv-result .avatar{width:200px;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+.sv-result .avatar svg{width:100%;height:auto;display:block}
+.sv-result h3{font-size:30px}
+.sv-result .zhname{font-family:var(--body);font-weight:500;color:var(--muted);font-size:18px;margin-left:10px}
+.sv-axes{display:grid;gap:10px;margin-top:16px}
+.axis{display:grid;grid-template-columns:70px 1fr 70px;gap:10px;align-items:center;font-size:13px;color:var(--muted)}
+.axis .track{height:8px;background:var(--line);border-radius:4px;position:relative}
+.axis .knob{position:absolute;top:-4px;width:16px;height:16px;border-radius:50%;background:var(--accent);transform:translateX(-50%)}
+.axis .r{text-align:right}
+.flag{display:inline-block;font-size:12px;padding:3px 8px;border-radius:999px;background:var(--accent-soft);color:var(--fg);margin-top:12px}
+@media (max-width:640px){.sv-result{grid-template-columns:1fr}.sv-result .avatar{width:160px}}
+.sv-owner{border-top:1px solid var(--line);padding-top:18px;display:grid;gap:12px}
+.sv-owner table{width:100%;border-collapse:collapse;font-size:14px}
+.sv-owner th,.sv-owner td{text-align:left;padding:8px 10px 8px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.sv-owner th{font-weight:600;color:var(--muted);font-size:12px}
+.sv-owner td .zh{color:var(--muted);font-size:13px;display:block}
+.tablewrap{overflow-x:auto}
+
+/* Hello Roots */
+.roots{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.roots .shots{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:18px;background:linear-gradient(180deg,var(--accent-soft),var(--surface) 80%)}
+.roots .shots img{border-radius:14px;border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.08)}
+.roots .flow{padding:22px;border-left:1px solid var(--line);display:grid;gap:14px;align-content:start;min-width:0}
+.roots .flow h3{font-size:16px}
+.pipe{display:grid;grid-template-columns:auto 1fr auto 1fr auto;gap:10px 10px;align-items:center;font-size:14px;margin-block:8px 6px}
+.pipe .node{padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface);white-space:nowrap}
+.pipe .edge{height:1px;background:var(--line);position:relative;min-width:0}
+.pipe .edge span{position:absolute;left:50%;top:-9px;transform:translateX(-50%);background:var(--surface);padding:0 6px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--muted);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:1000px){.pipe{grid-template-columns:auto 1fr auto}.pipe .edge:nth-child(4),.pipe .node:nth-child(5){display:none}}
+.roots .facts{display:grid;gap:8px;font-size:14px;color:var(--muted)}
+.roots .facts b{color:var(--fg);font-weight:600}
+@media (max-width:760px){.roots{grid-template-columns:1fr}.roots .flow{border-left:0;border-top:1px solid var(--line)}}
+
+/* Tab Harbor */
+.th{display:grid;grid-template-columns:1fr 1fr}
+.th-col{padding:18px;min-width:0}
+.th-col+.th-col{border-left:1px solid var(--line)}
+.th-col h3{font-size:14px;color:var(--muted);font-weight:600;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.tabs{display:grid;gap:4px}
+.tab{display:flex;gap:9px;align-items:center;font-size:13px;padding:5px 8px;border-radius:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tab img{width:14px;height:14px;flex:none;border-radius:3px}
+.tab span{overflow:hidden;text-overflow:ellipsis}
+.tab .host{color:var(--muted);flex:none;font-size:12px}
+.group{border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:10px}
+.group .gname{font-weight:600;font-size:14px;display:flex;justify-content:space-between;gap:10px}
+.group .gname small{color:var(--muted);font-weight:400}
+.group .tabs{margin-top:6px}
+.th input{width:100%;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--fg);font:inherit;font-size:14px}
+.th .empty{font-size:13px;color:var(--muted);padding:12px 0}
+@media (max-width:760px){.th{grid-template-columns:1fr}.th-col+.th-col{border-left:0;border-top:1px solid var(--line)}}
+
+/* now / also / contact */
+.now{border-top:2px solid var(--fg);padding-block:36px 72px;display:grid;grid-template-columns:1fr 2fr;gap:28px 48px}
+.now ul{list-style:none;margin:0;padding:0;display:grid;gap:14px;max-width:62ch}
+.now li b{font-weight:600}
+.now li span{color:var(--muted)}
+@media (max-width:720px){.now{grid-template-columns:1fr}}
+.contact{border-top:2px solid var(--fg);padding-block:36px 56px;display:grid;gap:22px}
+.contact .row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.contact .email{font-family:var(--display);font-weight:700;font-size:clamp(20px,3.6vw,34px);letter-spacing:-.01em;user-select:all}
+footer{padding-block:12px 40px;font-size:13px;color:var(--muted);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="top">
+  <span class="mark">Ziry Guo</span>
+  <nav aria-label="Sections">
+    <a href="#toneviz">ToneViz</a>
+    <a href="#survey">Survey Makeover</a>
+    <a href="#roots">Hello Roots</a>
+    <a href="#harbor">Tab Harbor</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</div>
+
+<section class="hero">
+  <div>
+    <h1>I build tools that help people learn.</h1>
+    <p class="lede">Honours Physics at the University of Waterloo. Everything below is something I made and you can use right now, on this page.</p>
+    <p class="zh muted">郭子瑞 · Waterloo, Ontario</p>
+    <a class="cta" href="#toneviz">Try the first one</a>
+  </div>
+  <figure class="portrait">
+    <img src="assets/ziry-portrait.jpg" alt="Ziry Guo standing in a square in Old Québec, with marigold beds and a green-roofed stone building behind her." width="900" height="908">
+    <figcaption>Old Québec, summer 2026</figcaption>
+  </figure>
+</section>
+
+<!-- ───────────────────────── ToneViz ───────────────────────── -->
+<section class="project" id="toneviz">
+  <header>
+    <div>
+      <h2>ToneViz</h2>
+      <p class="what">A Mandarin tone checker that says what to fix, not just how wrong you were. It extracts a learner's pitch, normalises it to their own voice, and scores the contour against the five tones.</p>
+    </div>
+    <div class="meta">
+      <span><b>Built</b> solo, in a few days, for my first résumé</span>
+      <span><b>Stack</b> Python, librosa (pYIN), NumPy, Streamlit</span>
+      <span><b>Result</b> got me into the Google × Waterloo Futures Lab</span>
+    </div>
+  </header>
+
+  <div>
+    <span class="try">Try it: draw a pitch curve, or record a syllable</span>
+    <div class="demo tv">
+      <div class="tv-canvas">
+        <canvas id="tvCanvas" width="760" height="400" aria-label="Pitch contour canvas. Drag to draw a pitch curve over time."></canvas>
+        <div class="tv-tools">
+          <span class="lab">Target</span>
+          <button class="btn" data-target="1" aria-pressed="false">mā 妈 (1)</button>
+          <button class="btn" data-target="2" aria-pressed="true">má 麻 (2)</button>
+          <button class="btn" data-target="3" aria-pressed="false">mǎ 马 (3)</button>
+          <button class="btn" data-target="4" aria-pressed="false">mà 骂 (4)</button>
+          <span class="sep"></span>
+          <button class="btn primary" id="tvRec">Record 1.5 s</button>
+          <button class="btn" id="tvSample">Load a sample</button>
+          <button class="btn" id="tvClear">Clear</button>
+        </div>
+        <p class="tv-status" id="tvStatus">Drag across the chart to draw how your pitch moves from the start of the syllable to the end.</p>
+      </div>
+      <div class="tv-result">
+        <div class="tv-big"><span class="score" id="tvScore">–</span><span class="of">/ 100 against the target</span></div>
+        <p class="tv-detected" id="tvDetected">Nothing scored yet.</p>
+        <div class="bars" id="tvBars"></div>
+        <div class="tv-fb" id="tvFeedback">Feedback appears here once there is a curve to judge.</div>
+      </div>
+    </div>
+  </div>
+
+  <p class="note">What you are using is ToneViz's pipeline ported to JavaScript for this page: pitch in semitones relative to the speaker's own median, time stretched to 0–100 %, then a mean-centred RMS distance to each tone template; the nearest template is the detected tone. The Python original does the pitch tracking with librosa's probabilistic YIN; here it is an autocorrelation tracker on the microphone, so it is rougher. The feedback rules are the same ones the Python version prints.</p>
+  <div class="links">
+    <a href="https://github.com/ziryg05-cloud/ToneViz">Source on GitHub</a>
+    <a href="assets/toneviz-figure.png">The matplotlib figure from the original</a>
+  </div>
+</section>
+
+<!-- ───────────────────────── Survey Makeover ───────────────────────── -->
+<section class="project" id="survey">
+  <header>
+    <div>
+      <h2>Survey Makeover</h2>
+      <p class="what">Paste in a boring questionnaire; get back a "which type are you?" quiz people actually finish. Every answer maps back to the original item, so the owner still gets their data table, plus flags for respondents who contradicted themselves or rushed.</p>
+    </div>
+    <div class="meta">
+      <span><b>Built</b> solo, Sept 2026</span>
+      <span><b>Stack</b> Python (http.server, pure-function scoring, pytest), Claude for the rewrite and the avatars</span>
+      <span><b>Result</b> pitched at the Velocity Pitch Competition, Waterloo</span>
+    </div>
+  </header>
+
+  <div>
+    <span class="try">Try it: a real output, made from a Chinese restaurant's 12-question satisfaction survey</span>
+    <div class="demo sv" id="svRoot"></div>
+  </div>
+
+  <p class="note">The quiz, the two axes, the four types and their avatars are the tool's actual output for that survey (translated from Chinese for this page). The scoring you just went through is a line-for-line port of <code>scoring.py</code>, including the contradiction check.</p>
+</section>
+
+<!-- ───────────────────────── Hello Roots ───────────────────────── -->
+<section class="project" id="roots">
+  <header>
+    <div>
+      <h2>Hello Roots</h2>
+      <p class="what">A Mandarin app for kids in heritage-language families. Pick a real situation such as a video call with grandpa, get a short generated lesson, then say it out loud and get pronunciation feedback a nine-year-old can act on.</p>
+    </div>
+    <div class="meta">
+      <span><b>Team</b> developer on a student team, Google × Waterloo Futures Lab, 8 weeks, Winter 2026</span>
+      <span><b>Stack</b> React 19, TypeScript, Vite, Tailwind; Express backend proxying Gemini</span>
+      <span><b>Result</b> presented at the Google–Waterloo "Future of Learning" symposium; tested with a handful of families</span>
+    </div>
+  </header>
+
+  <div>
+    <span class="try">Screens from the running app</span>
+    <div class="demo roots">
+      <div class="shots">
+        <img src="assets/roots-home.png" alt="Hello Roots home screen: the squirrel mascot, a Start Adventure button and a daily mission card." width="430" height="900">
+        <img src="assets/roots-missions.png" alt="Hello Roots mission board: four situations such as Call Grandpa and Family Feast, with Easy, Medium and Hard levels." width="430" height="900">
+      </div>
+      <div class="flow">
+        <h3>How a lesson gets made</h3>
+        <div class="pipe">
+          <span class="node">Browser</span><span class="edge"><span>/api/lesson · /api/tts · /api/evaluate</span></span><span class="node">Express</span><span class="edge"><span>key lives here</span></span><span class="node">Gemini</span>
+        </div>
+        <p class="note">Express is the only thing that talks to Gemini, so the API key never reaches the browser bundle. The three routes generate the lesson, read it aloud at normal or slowed speed, and score what the learner actually said, 0–5 stars with a tip.</p>
+        <div class="facts">
+          <span><b>What I did</b> software development and debugging on the team; after the program, moved the Gemini calls behind an Express server so the key never ships to the browser, and set the app up to deploy on Render</span>
+          <span><b>Now</b> back at Futures Lab for Fall 2026 as a mentor to the new cohort</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="links">
+    <a href="https://github.com/ziryg05-cloud/roots-learn-chinese">Source on GitHub</a>
+  </div>
+</section>
+
+<!-- ───────────────────────── Tab Harbor ───────────────────────── -->
+<section class="project" id="harbor">
+  <header>
+    <div>
+      <h2>Tab Harbor</h2>
+      <p class="what">A Chrome extension that closes a messy window safely: it groups the tabs by what you were doing, names each group from your own search terms, and lets you search and restore them later. No account, no network, no AI, just heuristics.</p>
+    </div>
+    <div class="meta">
+      <span><b>Built</b> solo, June 2026</span>
+      <span><b>Stack</b> vanilla JavaScript, Manifest V3; <code>core.js</code> is pure functions with 13 Node tests</span>
+      <span><b>Result</b> v1 shared with friends to test, with install notes</span>
+    </div>
+  </header>
+
+  <div>
+    <span class="try">Try it: this runs the extension's real core.js on 16 example tabs</span>
+    <div class="demo th">
+      <div class="th-col">
+        <h3><span>16 open tabs, in the order they were opened</span><button class="btn primary" id="thGroup">Group and name</button></h3>
+        <div class="tabs" id="thTabs"></div>
+      </div>
+      <div class="th-col">
+        <h3><span id="thCount">Groups</span></h3>
+        <input id="thSearch" type="search" placeholder="Search groups and tabs (try: tokyo, react, ikea)" aria-label="Search groups and tabs" disabled>
+        <div id="thGroups"><p class="empty">Press "Group and name" to run the grouping.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="note">Grouping stacks four signals: Chrome groups you already made, chains of tabs opened from the same page, loose tabs from one site, and the rest. Naming takes the search query you typed when one exists, otherwise words that repeat across titles, otherwise the site name. The file doing this on the page is unmodified from the extension.</p>
+</section>
+
+<!-- ───────────────────────── Now ───────────────────────── -->
+<section class="now" id="now">
+  <h2>Right now</h2>
+  <ul>
+    <li><b>Mentor, Futures Lab (Fall 2026).</b> <span>Matched with students in the new cohort as they build their own projects.</span></li>
+    <li><b>Undergraduate representative, Physics &amp; Astronomy.</b> <span>Collecting course feedback from physics undergrads and bringing it to the department.</span></li>
+    <li><b>Peer mentor, iEFAS at Renison.</b> <span>Helping incoming international students through their first term, which I did myself in Fall 2025.</span></li>
+    <li><b>Earlier.</b> <span>TESS light-curve analysis in Python (my first independent code); Capability Compass, a React demo mapping newcomers' situations to local Kitchener–Waterloo resources, built to pitch to Edith Law's lab.</span></li>
+  </ul>
+</section>
+
+<!-- ───────────────────────── Contact ───────────────────────── -->
+<section class="contact" id="contact">
+  <h2>Say hi</h2>
+  <div class="row">
+    <span class="email" id="emailText">z285guo@uwaterloo.ca</span>
+    <button class="btn" id="copyEmail">Copy</button>
+  </div>
+  <div class="links">
+    <a href="https://github.com/ziryg05-cloud">GitHub</a>
+  </div>
+</section>
+
+<footer>
+  <span>This page is one HTML file and a few assets, written by hand. No template, no framework.</span>
+  <span>Ziry Guo, 2026</span>
+</footer>
+
+</div>
+
+<script src="assets/survey-data.js"></script>
+<script src="assets/tabharbor-core.js"></script>
+<script>
+/* ============================ ToneViz (JS port) ============================ */
+(function(){
+  var N = 60; // samples across normalised time
+  function lin(a,b){ return Array.from({length:N}, function(_,i){ return a + (b-a)*i/(N-1); }); }
+  var TEMPLATES = {
+    1: lin(5,5),
+    2: lin(0,5),
+    3: Array.from({length:N}, function(_,i){ var t=i/(N-1); return t<0.5 ? -1.2 + (-5+1.2)*(t/0.5) : -5 + (2.5+5)*((t-0.5)/0.5); }),
+    4: lin(5,-5),
+    5: lin(0,-1.2)
+  };
+  var NAMES = {1:'Tone 1 (flat)',2:'Tone 2 (rising)',3:'Tone 3 (dipping)',4:'Tone 4 (falling)',5:'Neutral'};
+  var COLORS = {1:'--t1',2:'--t2',3:'--t3',4:'--t4',5:'--t5'};
+  var canvas = document.getElementById('tvCanvas'), ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height, PAD = {l:70,r:16,t:20,b:44};
+  var YMIN=-7, YMAX=7;
+  var points = [];            // raw drawn points {x:0..1, y:semitones}
+  var contour = null;         // resampled N
+  var target = 2;
+  var css = getComputedStyle(document.documentElement);
+  function tok(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+  function X(t){ return PAD.l + t*(W-PAD.l-PAD.r); }
+  function Y(s){ return PAD.t + (YMAX-s)/(YMAX-YMIN)*(H-PAD.t-PAD.b); }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    var fg=tok('--fg'), muted=tok('--muted'), line=tok('--line');
+    ctx.lineWidth=1; ctx.strokeStyle=line; ctx.font='20px '+tok('--body'); ctx.fillStyle=muted;
+    for(var s=-6;s<=6;s+=2){ ctx.beginPath(); ctx.moveTo(X(0),Y(s)); ctx.lineTo(X(1),Y(s)); ctx.stroke(); ctx.textAlign='right'; ctx.fillText((s>0?'+':'')+s, PAD.l-12, Y(s)+7); }
+    ctx.textAlign='center'; [0,0.5,1].forEach(function(t){ ctx.fillText(Math.round(t*100)+'%', X(t), H-12); });
+    ctx.save(); ctx.translate(22, (PAD.t+H-PAD.b)/2); ctx.rotate(-Math.PI/2); ctx.fillText('semitones vs. your median', 0, 0); ctx.restore();
+    // templates (faint), target emphasised
+    Object.keys(TEMPLATES).forEach(function(k){
+      var tpl=TEMPLATES[k]; ctx.beginPath();
+      tpl.forEach(function(v,i){ var x=X(i/(N-1)), y=Y(v); i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
+      ctx.strokeStyle=tok(COLORS[k]); ctx.globalAlpha = (+k===target)?0.9:0.22; ctx.lineWidth=(+k===target)?3:2;
+      if(+k===target) ctx.setLineDash([8,6]); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha=1;
+      ctx.fillStyle=tok(COLORS[k]); ctx.globalAlpha=(+k===target)?1:0.5; ctx.textAlign='left'; ctx.font='bold 19px '+tok('--body');
+      ctx.fillText('T'+k, X(1)-26, Y(tpl[N-1]) + (k==='1'?-8:(k==='2'?22:7))); ctx.globalAlpha=1;
+    });
+    // drawn contour
+    if(points.length>1){
+      ctx.beginPath(); points.forEach(function(p,i){ var x=X(p.x), y=Y(p.y); i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
+      ctx.strokeStyle=fg; ctx.lineWidth=3.5; ctx.lineJoin='round'; ctx.lineCap='round'; ctx.stroke();
+    }
+  }
+  function resample(){
+    if(points.length<2) return null;
+    var ps = points.slice().sort(function(a,b){return a.x-b.x;});
+    // ensure spans a good part of the axis: stretch to 0..1 (time normalisation)
+    var x0=ps[0].x, x1=ps[ps.length-1].x; if(x1-x0<0.05) return null;
+    var out=[]; for(var i=0;i<N;i++){ var t=x0+(x1-x0)*i/(N-1); var j=0; while(j<ps.length-2 && ps[j+1].x<t) j++;
+      var a=ps[j], b=ps[j+1]; var f=(b.x===a.x)?0:(t-a.x)/(b.x-a.x); out.push(a.y+(b.y-a.y)*f); }
+    // speaker normalisation: semitones relative to the median
+    var sorted=out.slice().sort(function(a,b){return a-b;}); var med=sorted[Math.floor(N/2)];
+    return out.map(function(v){return v-med;});
+  }
+  function center(a){ var m=a.reduce(function(s,v){return s+v;},0)/a.length; return a.map(function(v){return v-m;}); }
+  function rms(a,b){ var s=0; for(var i=0;i<a.length;i++){ s+=(a[i]-b[i])*(a[i]-b[i]); } return Math.sqrt(s/a.length); }
+  function score(c){
+    var cc=center(c), out={};
+    Object.keys(TEMPLATES).forEach(function(k){ var d=rms(cc, center(TEMPLATES[k])); out[k]=Math.max(0, Math.round(100-25*d)); });
+    return out;
+  }
+  function feedback(c, det){
+    var rise=c[N-1]-c[0], min=Math.min.apply(null,c), max=Math.max.apply(null,c), range=max-min;
+    var imin=c.indexOf(min), minPos=imin/(N-1), dipBefore = (minPos<0.6) && (c[0]-min>1.2) && rise>0.5;
+    var f = function(x){ return (Math.round(x*10)/10).toString(); };
+    switch(target){
+      case 1: if(range>2) return 'Tone 1 should stay level; yours moved '+f(range)+' semitones across the syllable. Hold the pitch steady.'; return 'Level and steady. That is Tone 1.';
+      case 2: if(dipBefore) return 'You dipped before rising (closer to Tone 3). Rise from the start instead.';
+              if(rise<3) return 'Tone 2 should rise clearly; yours rose only '+f(rise)+' semitones. Glide up more.';
+              return 'A clear rise of '+f(rise)+' semitones. That is Tone 2.';
+      case 3: if(c[0]-min<3) return 'Tone 3 needs a deeper dip. Drop further into the low valley before rising.';
+              if(c[N-1]-min<1.5) return 'Good dip, but Tone 3 comes back up at the end; let the pitch rise after the valley.';
+              return 'Down into the valley and back up. That is Tone 3.';
+      case 4: if(rise>-3) return 'Tone 4 should fall sharply; yours fell only '+f(-rise)+' semitones. Start high and drop fast.';
+              if(c[0]<max-1.5) return 'You rose before falling. Tone 4 starts at the top.';
+              return 'A sharp fall of '+f(-rise)+' semitones. That is Tone 4.';
+    }
+    return '';
+  }
+  function render(){
+    draw();
+    contour = resample();
+    var bars=document.getElementById('tvBars'), sc=document.getElementById('tvScore'), det=document.getElementById('tvDetected'), fb=document.getElementById('tvFeedback');
+    if(!contour){ bars.innerHTML=''; sc.textContent='–'; det.textContent='Nothing scored yet.'; fb.textContent='Feedback appears here once there is a curve to judge.'; return; }
+    var s=score(contour), best=Object.keys(s).sort(function(a,b){return s[b]-s[a];})[0];
+    sc.textContent=s[target];
+    det.innerHTML='Detected <b>'+NAMES[best]+'</b>'+(+best===target?', which matches the target.':', but the target was '+NAMES[target]+'.');
+    bars.innerHTML=Object.keys(s).map(function(k){ return '<div class="bar"><span>'+(k==='5'?'Neutral':'Tone '+k)+'</span><div class="track"><div class="fill" style="width:'+s[k]+'%;background:var('+COLORS[k]+')"></div></div><span class="v">'+s[k]+'</span></div>'; }).join('');
+    fb.textContent=feedback(contour, best);
+  }
+  // drawing
+  var drawing=false;
+  function pos(e){ var r=canvas.getBoundingClientRect(); var x=(e.clientX-r.left)/r.width*W, y=(e.clientY-r.top)/r.height*H;
+    return { x: Math.min(1,Math.max(0,(x-PAD.l)/(W-PAD.l-PAD.r))), y: Math.min(YMAX,Math.max(YMIN, YMAX-(y-PAD.t)/(H-PAD.t-PAD.b)*(YMAX-YMIN))) }; }
+  canvas.addEventListener('pointerdown', function(e){ drawing=true; points=[pos(e)]; canvas.setPointerCapture(e.pointerId); draw(); });
+  canvas.addEventListener('pointermove', function(e){ if(!drawing) return; var p=pos(e); if(points.length && p.x<points[points.length-1].x) return; points.push(p); draw(); });
+  function stop(){ if(!drawing) return; drawing=false; render(); setStatus(points.length>1?'Scored. Try another target or record your own voice.':'Drag across the chart to draw.'); }
+  canvas.addEventListener('pointerup', stop); canvas.addEventListener('pointercancel', stop);
+  function setStatus(t){ document.getElementById('tvStatus').textContent=t; }
+  document.querySelectorAll('[data-target]').forEach(function(b){ b.addEventListener('click', function(){
+    target=+b.dataset.target; document.querySelectorAll('[data-target]').forEach(function(x){ x.setAttribute('aria-pressed', x===b?'true':'false'); }); render(); }); });
+  document.getElementById('tvClear').addEventListener('click', function(){ points=[]; render(); setStatus('Cleared. Draw, load a sample, or record.'); });
+  // samples: a slightly noisy learner contour for the current target
+  var seed=1; function rnd(){ seed=(seed*9301+49297)%233280; return seed/233280-0.5; }
+  document.getElementById('tvSample').addEventListener('click', function(){
+    var tpl=TEMPLATES[target], shrink=[0.9,0.72,0.85,0.8][target-1], bias=rnd()*1.5, drift=0; points=[];
+    for(var i=0;i<N;i++){ drift = drift*0.7 + rnd()*0.9; points.push({x:i/(N-1), y: tpl[i]*shrink + bias + drift}); }
+    render(); setStatus('Loaded a sample learner contour for '+NAMES[target]+'. Notice it is scored on shape, not pitch height.');
+  });
+  // microphone: autocorrelation pitch tracker (65–500 Hz)
+  var recBtn=document.getElementById('tvRec');
+  recBtn.addEventListener('click', function(){
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ setStatus('The microphone is not available in this view. Draw a curve or load a sample instead.'); return; }
+    recBtn.disabled=true; setStatus('Say one syllable now…');
+    navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+      var AC=window.AudioContext||window.webkitAudioContext, ac=new AC(), src=ac.createMediaStreamSource(stream), an=ac.createAnalyser(); an.fftSize=2048; src.connect(an);
+      var buf=new Float32Array(an.fftSize), f0s=[], sr=ac.sampleRate, t0=performance.now();
+      (function tick(){
+        an.getFloatTimeDomainData(buf); var f=pitch(buf,sr); f0s.push(f);
+        if(performance.now()-t0<1500) requestAnimationFrame(tick);
+        else { stream.getTracks().forEach(function(t){t.stop();}); ac.close(); finish(f0s); }
+      })();
+    }).catch(function(){ recBtn.disabled=false; setStatus('Microphone permission was refused. Draw a curve or load a sample instead.'); });
+  });
+  function pitch(b,sr){
+    var n=b.length, e=0; for(var i=0;i<n;i++) e+=b[i]*b[i]; if(Math.sqrt(e/n)<0.012) return 0; // silence
+    var minLag=Math.floor(sr/500), maxLag=Math.floor(sr/65), best=0, bestLag=0;
+    for(var lag=minLag;lag<=maxLag;lag++){ var s=0; for(var j=0;j<n-lag;j++) s+=b[j]*b[j+lag]; s/= (n-lag); if(s>best){best=s;bestLag=lag;} }
+    var r0=e/n; if(best/r0<0.45) return 0; return sr/bestLag;
+  }
+  function finish(f0s){
+    recBtn.disabled=false;
+    var voiced=f0s.map(function(f,i){return {i:i,f:f};}).filter(function(p){return p.f>0;});
+    if(voiced.length<6){ setStatus('Not enough voiced sound was picked up. Speak a little louder and closer to the mic.'); return; }
+    // median smoothing, then semitones vs. median
+    var fs=voiced.map(function(p){return p.f;}); var sm=fs.map(function(_,i){ var w=fs.slice(Math.max(0,i-2),i+3).sort(function(a,b){return a-b;}); return w[Math.floor(w.length/2)]; });
+    var med=sm.slice().sort(function(a,b){return a-b;})[Math.floor(sm.length/2)];
+    var i0=voiced[0].i, i1=voiced[voiced.length-1].i;
+    points=voiced.map(function(p,k){ return { x:(p.i-i0)/Math.max(1,(i1-i0)), y: Math.max(YMIN,Math.min(YMAX, 12*Math.log2(sm[k]/med))) }; });
+    render(); setStatus('Recorded '+voiced.length+' voiced frames at a median of '+Math.round(med)+' Hz. Shape is what counts; your pitch height does not.');
+  }
+  if(window.matchMedia){ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render); }
+  new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+  render();
+})();
+
+/* ============================ Survey Makeover (port of scoring.py) ============================ */
+(function(){
+  var S = window.SURVEY, root=document.getElementById('svRoot'), idx=0, answers={}, started=null;
+  function h(html){ var d=document.createElement('div'); d.innerHTML=html; return d; }
+  function chosen(q,a){ if(a==null) return []; var idxs=Array.isArray(a)?a:[a]; return idxs.map(function(i){return q.options[i];}).filter(Boolean); }
+  function axisScores(){ var sc={}; S.axes.forEach(function(a){ sc[a.id]={low:0,high:0}; });
+    S.questions.forEach(function(q){ chosen(q,answers[q.id]).forEach(function(o){ if(o.axis && sc[o.axis] && (o.side==='low'||o.side==='high')) sc[o.axis][o.side]+= (o.points||0); }); }); return sc; }
+  function pickType(){ var sc=axisScores(), key={}; Object.keys(sc).forEach(function(a){ key[a]= sc[a].high>sc[a].low?'high':'low'; });
+    return S.types.filter(function(t){ return Object.keys(t.key).every(function(a){return t.key[a]===key[a];}); })[0]; }
+  function flags(dur){ var out=[], sc=axisScores(); Object.keys(sc).some(function(a){ var s=sc[a], tot=s.low+s.high; if(tot && s.low>=0.4*tot && s.high>=0.4*tot){ out.push('Contradictory answers'); return true; } });
+    if(dur!=null && dur < S.questions.length*1.5) out.push('Too fast'); return out; }
+  function renderQ(){
+    var q=S.questions[idx], a=answers[q.id];
+    root.innerHTML='';
+    root.appendChild(h('<div class="sv-head"><h3>'+S.title+'<span class="zh">'+S.title_zh+'</span></h3><span class="muted" style="font-size:13px">'+(idx+1)+' of '+S.questions.length+'</span></div><div class="sv-prog"><i style="width:'+(idx/S.questions.length*100)+'%"></i></div>'));
+    root.appendChild(h('<p class="sv-q">'+q.text+'<small>Original item: '+q.orig.text+' · '+q.orig.text_zh+(q.type==='multi'?' · pick any':'')+'</small></p>'));
+    var opts=h('<div class="sv-opts" role="'+(q.type==='multi'?'group':'radiogroup')+'"></div>').firstChild;
+    q.options.forEach(function(o,i){
+      var on = q.type==='multi' ? (Array.isArray(a)&&a.indexOf(i)>=0) : a===i;
+      var b=h('<button class="sv-opt" role="'+(q.type==='multi'?'checkbox':'radio')+'" aria-checked="'+on+'"'+(q.type==='multi'?' data-multi':'')+'><span class="dot"></span><span>'+o.text+'</span></button>').firstChild;
+      b.addEventListener('click', function(){ if(!started) started=Date.now();
+        if(q.type==='multi'){ var arr=Array.isArray(answers[q.id])?answers[q.id].slice():[]; var k=arr.indexOf(i); k>=0?arr.splice(k,1):arr.push(i); answers[q.id]=arr; renderQ(); }
+        else { answers[q.id]=i; setTimeout(next, 180); } });
+      opts.appendChild(b);
+    });
+    root.appendChild(opts);
+    var nav=h('<div class="sv-nav"><button class="btn" id="svBack"'+(idx===0?' disabled':'')+'>Back</button>'+(q.type==='multi'||a!=null?'<button class="btn primary" id="svNext">'+(idx===S.questions.length-1?'See my type':'Next')+'</button>':'<span class="muted" style="font-size:13px">Pick one to continue</span>')+'</div>').firstChild;
+    root.appendChild(nav);
+    var bk=nav.querySelector('#svBack'), nx=nav.querySelector('#svNext');
+    if(bk) bk.addEventListener('click', function(){ idx=Math.max(0,idx-1); renderQ(); });
+    if(nx) nx.addEventListener('click', next);
+  }
+  function next(){ if(idx<S.questions.length-1){ idx++; renderQ(); } else renderResult(); }
+  function esc(s){ return String(s).replace(/</g,'&lt;'); }
+  function renderResult(){
+    var t=pickType()||S.types[0], sc=axisScores(), dur=started?(Date.now()-started)/1000:null, fl=flags(dur);
+    root.innerHTML='';
+    var ax=S.axes.map(function(a){ var s=sc[a.id], tot=s.low+s.high, p= tot? s.high/tot : 0.5;
+      return '<div class="axis"><span>'+a.low+'</span><div class="track"><span class="knob" style="left:'+(p*100)+'%"></span></div><span class="r">'+a.high+'</span></div>'; }).join('');
+    root.appendChild(h('<div class="sv-result"><div class="avatar">'+t.svg+'</div><div><span class="try">Your type</span><h3>'+t.name+'<span class="zhname">'+t.name_zh+'</span></h3><p style="margin-top:12px;max-width:52ch">'+t.desc+'</p><div class="sv-axes">'+ax+'</div>'+fl.map(function(f){return '<span class="flag">Flag for the owner: '+f+'</span>';}).join(' ')+'</div></div>'));
+    var rows=S.questions.map(function(q){ var cs=chosen(q,answers[q.id]); var en=cs.map(function(o){return q.orig.options[o.orig];}).join(', ')||'—'; var zh=cs.map(function(o){return q.orig.options_zh[o.orig];}).join('、');
+      return '<tr><td>'+q.orig.text+'<span class="zh">'+esc(q.orig.text_zh)+'</span></td><td>'+esc(en)+'<span class="zh">'+esc(zh)+'</span></td></tr>'; }).join('');
+    root.appendChild(h('<div class="sv-owner"><div><span class="try">What the restaurant owner sees</span><p class="note">Your playful answers, written back as the plain survey items they came from. This is the row that goes into the CSV.</p></div><div class="tablewrap"><table><thead><tr><th>Original item</th><th>Your answer, mapped back</th></tr></thead><tbody>'+rows+'</tbody></table></div><div class="sv-nav"><span class="muted" style="font-size:13px">'+(dur?('Completed in '+Math.round(dur)+' s'):'')+'</span><button class="btn" id="svAgain">Take it again</button></div></div>'));
+    root.querySelector('#svAgain').addEventListener('click', function(){ idx=0; answers={}; started=null; renderQ(); });
+  }
+  renderQ();
+})();
+
+/* ============================ Tab Harbor (runs the real core.js) ============================ */
+(function(){
+  function fav(letter,color){ var svg="<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'><rect width='16' height='16' rx='4' fill='"+color+"'/><text x='8' y='12' font-size='10' fill='white' text-anchor='middle' font-family='sans-serif'>"+letter+"</text></svg>"; return "data:image/svg+xml;utf8,"+encodeURIComponent(svg); }
+  var TABS=[
+    {id:1,openerTabId:null,groupId:-1,url:"https://www.google.com/search?q=tokyo+5+day+itinerary",title:"tokyo 5 day itinerary - Google Search",favIconUrl:fav("G","#4285f4")},
+    {id:40,openerTabId:null,groupId:-1,url:"https://mail.google.com/mail/u/0/#inbox",title:"Inbox (3) - you@gmail.com - Gmail",favIconUrl:fav("@","#ea4335")},
+    {id:2,openerTabId:1,groupId:-1,url:"https://www.japan-guide.com/e/e2164.html",title:"Tokyo Travel Guide - japan-guide.com",favIconUrl:fav("J","#c0392b")},
+    {id:30,openerTabId:null,groupId:-1,url:"https://www.youtube.com/watch?v=jfKfPfyJRdk",title:"lofi hip hop radio - beats to relax/study to - YouTube",favIconUrl:fav("Y","#ff0000")},
+    {id:3,openerTabId:1,groupId:-1,url:"https://www.tripadvisor.com/Tourism-Tokyo.html",title:"15 Best Things to Do in Tokyo (2026) - Tripadvisor",favIconUrl:fav("T","#1a8f6b")},
+    {id:10,openerTabId:null,groupId:-1,url:"https://www.google.com/search?q=react+useState+not+updating",title:"react useState not updating - Google Search",favIconUrl:fav("G","#4285f4")},
+    {id:11,openerTabId:10,groupId:-1,url:"https://stackoverflow.com/questions/54069253",title:"reactjs - useState set method not reflecting change immediately - Stack Overflow",favIconUrl:fav("S","#e67e22")},
+    {id:20,openerTabId:null,groupId:7,url:"https://www.nytimes.com/wirecutter/reviews/best-standing-desks/",title:"The 4 Best Standing Desks of 2026 - Wirecutter",favIconUrl:fav("W","#111111")},
+    {id:4,openerTabId:1,groupId:-1,url:"https://www.google.com/maps/place/Tokyo",title:"Tokyo - Google Maps",favIconUrl:fav("M","#34a853")},
+    {id:12,openerTabId:10,groupId:-1,url:"https://github.com/facebook/react/issues/14066",title:"Bug: setState in useEffect loops · Issue #14066 · facebook/react",favIconUrl:fav("H","#24292f")},
+    {id:21,openerTabId:null,groupId:7,url:"https://www.reddit.com/r/StandingDesks/comments/abc",title:"Standing desk recommendations under $400? : r/StandingDesks",favIconUrl:fav("R","#ff4500")},
+    {id:41,openerTabId:null,groupId:-1,url:"https://www.nytimes.com/2026/06/29/world/some-headline.html",title:"Some Big Headline Everyone Is Talking About - The New York Times",favIconUrl:fav("N","#111111")},
+    {id:13,openerTabId:10,groupId:-1,url:"https://react.dev/reference/react/useState",title:"useState - React",favIconUrl:fav("R","#149eca")},
+    {id:31,openerTabId:null,groupId:-1,url:"https://www.youtube.com/watch?v=bJUiWdM__Qw",title:"How to make perfect pasta - YouTube",favIconUrl:fav("Y","#ff0000")},
+    {id:22,openerTabId:null,groupId:7,url:"https://www.ikea.com/us/en/p/bekant-desk-sit-stand",title:"BEKANT Desk sit/stand - IKEA",favIconUrl:fav("I","#0058a3")},
+    {id:42,openerTabId:null,groupId:-1,url:"https://www.notion.so/Project-Plan-abc123",title:"Project Plan - Notion",favIconUrl:fav("N","#000000")}
+  ];
+  function host(u){ try{ return new URL(u).hostname.replace(/^www\./,''); }catch(e){ return ''; } }
+  function esc(s){ return String(s).replace(/</g,'&lt;'); }
+  function tabHTML(t){ return '<div class="tab"><img src="'+t.favIconUrl+'" alt=""><span>'+esc(t.title)+'</span><span class="host">'+host(t.url)+'</span></div>'; }
+  document.getElementById('thTabs').innerHTML=TABS.map(tabHTML).join('');
+  var SESSIONS=null, out=document.getElementById('thGroups'), search=document.getElementById('thSearch');
+  function renderGroups(q){
+    var view = q ? TabHarborCore.searchSessions(SESSIONS, q) : SESSIONS;
+    if(!view.length){ out.innerHTML='<p class="empty">No group or tab matches "'+esc(q)+'".</p>'; return; }
+    out.innerHTML=view.map(function(g){ return '<div class="group"><div class="gname"><span>'+esc(g.name)+'</span><small>'+g.tabs.length+' tab'+(g.tabs.length>1?'s':'')+'</small></div><div class="tabs">'+g.tabs.map(tabHTML).join('')+'</div></div>'; }).join('');
+    document.getElementById('thCount').textContent = view.length+' group'+(view.length>1?'s':'')+(q?' matching':'')+', named by core.js';
+  }
+  document.getElementById('thGroup').addEventListener('click', function(){
+    var groups=TabHarborCore.groupTabs(TABS);
+    SESSIONS=groups.map(function(g,i){ return {id:'demo'+i, name:g.name==='其它'?'Everything else':g.name, autoName:g.autoName, isOther:!!g.isOther, stashedAt:Date.now()-i*3600000, tabs:g.tabs.map(function(t){ return {url:t.url,title:t.title,favIconUrl:t.favIconUrl}; })}; });
+    search.disabled=false; search.value=''; renderGroups(''); this.textContent='Run again'; });
+  search.addEventListener('input', function(){ if(SESSIONS) renderGroups(this.value.trim()); });
+})();
+
+/* ============================ Contact ============================ */
+(function(){
+  var b=document.getElementById('copyEmail'), t=document.getElementById('emailText');
+  b.addEventListener('click', function(){
+    var done=function(){ b.textContent='Copied'; setTimeout(function(){ b.textContent='Copy'; },1600); };
+    try{ navigator.clipboard.writeText(t.textContent).then(done, function(){ var r=document.createRange(); r.selectNodeContents(t); var s=getSelection(); s.removeAllRanges(); s.addRange(r); }); }
+    catch(e){ var r=document.createRange(); r.selectNodeContents(t); var s=getSelection(); s.removeAllRanges(); s.addRange(r); }
+  });
+})();
+</script>
+</body>
+</html>
