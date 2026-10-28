@@ -154,19 +154,20 @@ p{margin:0}
 .tablewrap{overflow-x:auto}
 
 /* Hello Roots */
-.roots{display:grid;grid-template-columns:1fr 1fr;gap:0}
-.roots .shots{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:18px;background:linear-gradient(180deg,var(--accent-soft),var(--surface) 80%)}
-.roots .shots img{border-radius:14px;border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.08)}
-.roots .flow{padding:22px;border-left:1px solid var(--line);display:grid;gap:14px;align-content:start;min-width:0}
-.roots .flow h3{font-size:16px}
-.pipe{display:grid;grid-template-columns:auto 1fr auto 1fr auto;gap:10px 10px;align-items:center;font-size:14px;margin-block:8px 6px}
-.pipe .node{padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface);white-space:nowrap}
-.pipe .edge{height:1px;background:var(--line);position:relative;min-width:0}
-.pipe .edge span{position:absolute;left:50%;top:-9px;transform:translateX(-50%);background:var(--surface);padding:0 6px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--muted);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
-@media (max-width:1000px){.pipe{grid-template-columns:auto 1fr auto}.pipe .edge:nth-child(4),.pipe .node:nth-child(5){display:none}}
-.roots .facts{display:grid;gap:8px;font-size:14px;color:var(--muted)}
-.roots .facts b{color:var(--fg);font-weight:600}
-@media (max-width:760px){.roots{grid-template-columns:1fr}.roots .flow{border-left:0;border-top:1px solid var(--line)}}
+.roots{display:grid;grid-template-columns:auto 1fr;gap:0}
+.roots .shots{display:flex;gap:16px;padding:24px;background:linear-gradient(180deg,var(--accent-soft),var(--surface) 85%);align-items:flex-start}
+.roots .shots img{width:220px;height:auto;border-radius:18px;border:1px solid var(--line);box-shadow:0 8px 24px rgba(21,28,44,.10)}
+.roots .flow{padding:28px;border-left:1px solid var(--line);display:grid;gap:20px;align-content:center;min-width:0}
+.roots .flow h3{font-size:18px}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:0;counter-reset:s}
+.steps li{display:grid;grid-template-columns:28px 1fr;gap:4px 12px;padding-block:12px;border-top:1px solid var(--line);counter-increment:s}
+.steps li:last-child{border-bottom:1px solid var(--line)}
+.steps li::before{content:counter(s);grid-row:span 2;width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--fg);font-size:13px;font-weight:600;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.steps code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;color:var(--accent)}
+.steps span{font-size:15px;line-height:1.45}
+.roots .facts{display:grid;gap:10px;font-size:15px;color:var(--muted)}
+.roots .facts b{color:var(--fg);font-weight:600;display:block;font-size:13px}
+@media (max-width:900px){.roots{grid-template-columns:1fr}.roots .shots{justify-content:center}.roots .shots img{width:min(220px,calc(50% - 8px))}.roots .flow{border-left:0;border-top:1px solid var(--line)}}
 
 /* Tab Harbor */
 .th{display:grid;grid-template-columns:1fr 1fr}
@@ -314,18 +315,20 @@ footer{padding-block:12px 40px;font-size:13px;color:var(--muted);display:flex;ju
     <span class="try">Screens from the running app</span>
     <div class="demo roots">
       <div class="shots">
-        <img src="assets/roots-home.png" alt="Hello Roots home screen: the squirrel mascot, a Start Adventure button and a daily mission card." width="430" height="900">
-        <img src="assets/roots-missions.png" alt="Hello Roots mission board: four situations such as Call Grandpa and Family Feast, with Easy, Medium and Hard levels." width="430" height="900">
+        <img src="assets/roots-home.jpg" alt="Hello Roots home screen: the squirrel mascot, a Start Adventure button and a daily mission card." width="480" height="1005">
+        <img src="assets/roots-missions.jpg" alt="Hello Roots mission board: four situations such as Call Grandpa and Family Feast, with Easy, Medium and Hard levels." width="480" height="1005">
       </div>
       <div class="flow">
         <h3>How a lesson gets made</h3>
-        <div class="pipe">
-          <span class="node">Browser</span><span class="edge"><span>/api/lesson · /api/tts · /api/evaluate</span></span><span class="node">Express</span><span class="edge"><span>key lives here</span></span><span class="node">Gemini</span>
-        </div>
-        <p class="note">Express is the only thing that talks to Gemini, so the API key never reaches the browser bundle. The three routes generate the lesson, read it aloud at normal or slowed speed, and score what the learner actually said, 0–5 stars with a tip.</p>
+        <ol class="steps">
+          <li><code>/api/lesson</code><span>Gemini writes a short lesson for the situation and level the child picked.</span></li>
+          <li><code>/api/tts</code><span>Every word and phrase is read aloud, at normal or slowed-down speed.</span></li>
+          <li><code>/api/evaluate</code><span>The app transcribes what the child actually said and scores it 0–5 stars, with one tip.</span></li>
+        </ol>
+        <p class="note">All three go through a small Express server, the only place the Gemini key lives, so it never ships to the browser.</p>
         <div class="facts">
-          <span><b>What I did</b> software development and debugging on the team; after the program, moved the Gemini calls behind an Express server so the key never ships to the browser, and set the app up to deploy on Render</span>
-          <span><b>Now</b> back at Futures Lab for Fall 2026 as a mentor to the new cohort</span>
+          <span><b>What I did</b>Software development and debugging on the team. After the program, moved the Gemini calls behind that Express server and set the app up to deploy on Render.</span>
+          <span><b>Now</b>Back at Futures Lab for Fall 2026 as a mentor to the new cohort.</span>
         </div>
       </div>
     </div>
